@@ -14,27 +14,32 @@
     />
     <title>Busca CEP</title>
   </head>
-  <body>
-    <div id="app">
-      <header>
+  <body style="height: 100vh" class="bg-light">
+    <div id="app" class="container h-100 d-flex flex-column">
+      <header class="text-bg-warning p-5">
         <h1>Busca CEP</h1>
       </header>
-      <main>
-        <form @submit.prevent="getAddress">
-          <label for="cep">Insira um CEP</label>
-          <input
-            v-model="cep"
-            type="text"
-            inputmode="decimal"
-            placeholder="89520000"
-            autocomplete="postal-code"
-            pattern="[0-9]{8}"
-            required
-          />
-          <button type="submit">Buscar</button>
+
+      <main class="p-3 flex-grow-1">
+        <form @submit.prevent="getAddress" class="mb-3">
+          <label for="cep" class="fs-5">Insira um CEP</label>
+          <div class="input-group mt-2" style="max-width: 25rem">
+            <input
+              id="cep"
+              v-model="cep"
+              type="text"
+              inputmode="decimal"
+              placeholder="89520000"
+              autocomplete="postal-code"
+              pattern="[0-9]{8}"
+              required
+              class="form-control"
+            />
+            <button type="submit" class="btn bg-warning">Buscar</button>
+          </div>
         </form>
 
-        <div v-show="loading" class="text-center">
+        <div v-show="loading" class="text-center mt-5 pt-5">
           <div
             class="spinner-border text-warning"
             role="status"
@@ -44,17 +49,36 @@
           </div>
         </div>
 
-        <div v-show="error">CEP não encontrado</div>
+        <div v-show="error">
+          <p class="fs-4 mt-4">CEP não encontrado</p>
+        </div>
 
-        <div v-show="displayAddress">
-          <h3>{{address.cep}}</h3>
-          <h3>{{address.logradouro}}</h3>
-          <h3>{{address.bairro}}</h3>
-          <h3>{{address.localidade}}</h3>
-          <h3>{{address.uf}}</h3>
+        <div v-show="displayAddress" class="mt-5">
+          <h3 class="mb-3">{{address.cep}}</h3>
+          <ul class="list-unstyled fs-5">
+            <li class="mb-2">
+              <span class="fw-semibold">Logradouro: </span>
+              <span>{{address.logradouro}}</span>
+            </li>
+            <li class="mb-2">
+              <span class="fw-semibold">Bairro: </span>
+              <span>{{address.bairro}}</span>
+            </li>
+            <li class="mb-2">
+              <span class="fw-semibold">Cidade: </span>
+              <span> {{address.localidade}}</span>
+            </li>
+            <li>
+              <span class="fw-semibold">Estado: </span>
+              <span>{{address.uf}}</span>
+            </li>
+          </ul>
         </div>
       </main>
-      <footer>2022</footer>
+
+      <footer class="bg-warning p-3 text-center">
+        <span class="fw-light">2022</span>
+      </footer>
     </div>
 
     <script>
@@ -71,7 +95,7 @@
         },
         computed: {
           displayAddress() {
-            return !this.error && !!{};
+            return !this.error && Object.keys(this.address).length;
           },
         },
         methods: {
@@ -84,11 +108,11 @@
               .then((res) => {
                 if (res.erro) return (this.error = true);
                 this.address = res;
+                this.cep = "";
               })
               .catch((e) => {
                 this.error = true;
               });
-
             this.loading = false;
           },
         },
