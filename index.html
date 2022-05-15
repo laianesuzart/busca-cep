@@ -25,12 +25,34 @@
           <input
             v-model="cep"
             type="text"
+            inputmode="decimal"
             placeholder="89520000"
+            autocomplete="postal-code"
             pattern="[0-9]{8}"
             required
           />
           <button type="submit">Buscar</button>
         </form>
+
+        <div v-show="loading" class="text-center">
+          <div
+            class="spinner-border text-warning"
+            role="status"
+            style="width: 3rem; height: 3rem"
+          >
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+        </div>
+
+        <div v-show="error">CEP não encontrado</div>
+
+        <div v-show="displayAddress">
+          <h3>{{address.cep}}</h3>
+          <h3>{{address.logradouro}}</h3>
+          <h3>{{address.bairro}}</h3>
+          <h3>{{address.localidade}}</h3>
+          <h3>{{address.uf}}</h3>
+        </div>
       </main>
       <footer>2022</footer>
     </div>
@@ -42,11 +64,32 @@
         data() {
           return {
             cep: "",
+            address: {},
+            loading: false,
+            error: false,
           };
+        },
+        computed: {
+          displayAddress() {
+            return !this.error && !!{};
+          },
         },
         methods: {
           getAddress() {
-            console.log(this.cep);
+            this.loading = true;
+            this.error = false;
+
+            fetch(`https://viacep.com.br/ws/${this.cep}/json/`)
+              .then((res) => res.json())
+              .then((res) => {
+                if (res.erro) return (this.error = true);
+                this.address = res;
+              })
+              .catch((e) => {
+                this.error = true;
+              });
+
+            this.loading = false;
           },
         },
       }).mount("#app");
